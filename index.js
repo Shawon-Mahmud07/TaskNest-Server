@@ -23,6 +23,17 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    // Get the database and collection on which to run the operation
+    const toDoTaskCollections = client
+      .db("TaskManagement")
+      .collection("ToDoList");
+
+    // Insert a to-do Task to the DB: post method
+    app.post("/Add-ToDo", async (req, res) => {
+      const data = req.body;
+      const result = await toDoTaskCollections.insertOne(data);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
