@@ -28,10 +28,23 @@ async function run() {
       .db("TaskManagement")
       .collection("ToDoList");
 
+    // All Post Method
+    // ===================
     // Insert a to-do Task to the DB: post method
     app.post("/Add-ToDo", async (req, res) => {
       const data = req.body;
       const result = await toDoTaskCollections.insertOne(data);
+      res.send(result);
+    });
+    //  All Get Method
+    // ===================
+    // get user store info from DB: get method
+    app.get("/user-todo", async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email };
+      }
+      const result = await toDoTaskCollections.find(query).toArray();
       res.send(result);
     });
 
