@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 var cors = require("cors");
 const port = process.env.PORT || 5000;
@@ -22,7 +22,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Get the database and collection on which to run the operation
     const toDoTaskCollections = client
       .db("TaskManagement")
@@ -38,7 +38,7 @@ async function run() {
     });
     //  All Get Method
     // ===================
-    // get user store info from DB: get method
+    // get user todo task list from DB: get method
     app.get("/user-todo", async (req, res) => {
       let query = {};
       if (req.query?.email) {
@@ -48,11 +48,31 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/single-todo", async (req, res) => {
+      let query = {};
+      if (req.query?.id) {
+        query = { _id: new ObjectId(req.query.id) };
+      }
+      const result = await toDoTaskCollections.findOne(query);
+      res.send(result);
+    });
+
+    //  All Delete Method
+    // ===================
+    // delete product by id using delete method
+    app.delete("/delete-todo/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await toDoTaskCollections.deleteOne(query);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
